@@ -6,14 +6,18 @@ const getProfile = async (request, h) => {
   const userId = request.auth.credentials.id;
   const db = getDb();
 
-  const user = await db.collection('users').findOne({ id: userId }, { projection: { password: 0, _id: 0 } });
+  const user = await db
+    .collection('users')
+    .findOne({ id: userId }, { projection: { password: 0, _id: 0 } });
   if (!user) return Boom.notFound('User tidak ditemukan');
 
-  return h.response({
-    error: false,
-    message: 'Berhasil mendapatkan profil',
-    user,
-  }).code(200);
+  return h
+    .response({
+      error: false,
+      message: 'Berhasil mendapatkan profil',
+      user,
+    })
+    .code(200);
 };
 
 const updateProfile = async (request, h) => {
@@ -25,22 +29,25 @@ const updateProfile = async (request, h) => {
   }
 
   const db = getDb();
-  const updateResult = await db.collection('users').updateOne(
-    { id: userId },
-    { $set: { name, photo: photo || '' } }
-  );
+  const updateResult = await db
+    .collection('users')
+    .updateOne({ id: userId }, { $set: { name, photo: photo || '' } });
 
   if (updateResult.matchedCount === 0) {
     return Boom.notFound('User tidak ditemukan');
   }
 
-  const user = await db.collection('users').findOne({ id: userId }, { projection: { password: 0, _id: 0 } });
+  const user = await db
+    .collection('users')
+    .findOne({ id: userId }, { projection: { password: 0, _id: 0 } });
 
-  return h.response({
-    error: false,
-    message: 'Profil berhasil diperbarui',
-    user,
-  }).code(200);
+  return h
+    .response({
+      error: false,
+      message: 'Profil berhasil diperbarui',
+      user,
+    })
+    .code(200);
 };
 
 const updatePassword = async (request, h) => {
@@ -59,12 +66,13 @@ const updatePassword = async (request, h) => {
   }
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
-  await db.collection('users').updateOne(
-    { id: userId },
-    { $set: { password: hashedPassword } }
-  );
+  await db
+    .collection('users')
+    .updateOne({ id: userId }, { $set: { password: hashedPassword } });
 
-  return h.response({ error: false, message: 'Password berhasil diperbarui' }).code(200);
+  return h
+    .response({ error: false, message: 'Password berhasil diperbarui' })
+    .code(200);
 };
 
 module.exports = { getProfile, updateProfile, updatePassword };

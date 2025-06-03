@@ -1,10 +1,15 @@
-## 🍽️ Resep API - Hapi.js + MongoDB
+## 🍽️🔥 WereCooked API
 
 REST API sederhana untuk mencari dan melihat resep makanan berdasarkan bahan, dibangun menggunakan [Hapi.js](https://hapi.dev/) dan [MongoDB](https://www.mongodb.com/).
 
 ---
 
 ## 🚀 Fitur
+
+* Registrasi dan login pengguna (autentikasi JWT)
+* Manajemen bookmark resep oleh pengguna
+* Pencarian dan detail resep masakan
+* Pengelolaan profil pengguna (update profil dan password)
 
 - Ambil daftar resep
 - Lihat detail resep berdasarkan ID
@@ -17,21 +22,34 @@ REST API sederhana untuk mencari dan melihat resep makanan berdasarkan bahan, di
 ## 📁 Struktur Proyek
 
 ```
-
 project-root/
-├── .env
-├── controllers/
-│   └── resepController.js
-├── handlers/
-│   └── resepHandlers.js
-├── models/
-│   └── resepModel.js
-├── routes/
-│   └── resepRoutes.js
-├── server.js
-└── README.md
+├── server.js                  # Entry point aplikasi
+├── src/
+│   ├── handlers/             # Controller untuk request handling
+│   │   ├── authHandler.js    # Logika register & login
+│   │   ├── bookmarkHandler.js# Logika CRUD bookmark
+│   │   ├── recipeHandler.js  # Logika resep masakan
+│   │   └── userHandler.js    # Logika profil user
+│   ├── middlewares/          # Middleware, misal autentikasi
+│   │   └── authMiddleware.js
+│   ├── routes/               # Route definitions
+│   │   ├── authRoutes.js     # Route register & login
+│   │   ├── bookmarkRoutes.js # Route bookmark (dengan auth)
+│   │   ├── recipeRoutes.js   # Route resep masakan
+│   │   └── userRoutes.js     # Route profil user (dengan auth)
+│   ├── services/             # Business logic dan akses DB
+│   │   ├── db.js             # Koneksi database
+│   │   └── userService.js    # Service user
+│   ├── utils/                # Utility helper functions
+│   │   ├── hash.js           # Hash password
+│   │   └── token.js          # Generate JWT token
+│   └── validations/          # Validasi input request
+│       └── authValidation.js # Joi schema untuk register
+├── .env                      # Konfigurasi environment variables
+├── package.json              # Dependencies dan scripts
+└── readme.md                 # Dokumentasi proyek
+```
 
-````
 
 ---
 
@@ -76,112 +94,355 @@ http://localhost:3000
 
 ## 📚 Dokumentasi API
 
-### 🔹 GET `/`
+## Autentikasi
 
-Cek status server.
+### POST /register
 
-**Respons:**
+Registrasi user baru.
 
-```text
-API Resep is running!
-```
-
----
-
-### 🔹 GET `/resep`
-
-Ambil 10 resep pertama.
-
-**Contoh Respons:**
-
-```json
-[
-  {
-    "id": "0ca626cf-dabd-4b7d-b0ae-e0594371db3a",
-    "Title": "Ayam Woku Manado",
-    "Ingredients": "1 Ekor Ayam Kampung (potong 12)--2 Buah Jeruk Nipis--2 Sdm Garam--3 Ruas Kunyit--7 Bawang Merah--7 Bawang Putih--10 Cabe Merah--10 Cabe Rawit Merah (sesuai selera)--3 Butir Kemiri--2 Batang Sereh--2 Lembar Daun Salam--2 Ikat Daun Kemangi--Penyedap Rasa--1 1/2 Gelas Air--",
-    "Steps": "1) Cuci bersih ayam dan tiriskan. Lalu peras jeruk nipis (kalo gak ada jeruk nipis bisa pake cuka) dan beri garam. Aduk hingga merata dan diamkan selama 5 menit, biar ayam gak bau amis.\n2) Goreng ayam tersebut setengah matang, lalu tiriskan\n3) Haluskan bumbu menggunakan blender. Bawang merah, bawang putih, cabe merah, cabe rawit, kemiri dan kunyit. Oh iya kasih minyak sedikit yaa biar bisa di blender. Untuk sereh nya di geprek aja terus di buat simpul.\n4) Setelah bumbu di haluskan barulah di tumis. Jangan lupa sereh dan daun salamnya juga ikut di tumis. Di tumis sampai berubah warna ya\n5) Masukan ayam yang sudah di goreng setengah matang ke dalam bumbu yang sudah di tumis, dan diamkan 5 menit dulu. Biar bumbu meresap. Lalu tuangkan 1 1/2 Gelas air. Lalu tambahkan penyedap rasa (saya 3 Sdt, tapi sesuai selera ya) koreksi rasa dan Biar kan sampai mendidih\n6) Setelah masakan mendidih, lalu masukan daun kemangi yang sudah di potong potong. Masak lagi sekitar 10 menit. And taraaaaaaaaaaaaaa..... jadi deh Ayam Woku Manadonya.\n7) Oh iyaa kalo mau di tambahkan potongan tomat merah juga bisa ko. Sesuai selera aja yaa buibuuuu",
-    "Loves": "1",
-    "URL": "https://cookpad.com/id/resep/4473027-ayam-woku-manado",
-    "Category": "ayam",
-    "Title Cleaned": "ayam woku manado",
-    "Total Ingredients": "14",
-    "Ingredients Cleaned": "ayam kampung potong , jeruk nipis , garam , kunyit , bawang merah , bawang putih , cabe merah , cabe rawit merah , kemiri , serai , daun salam , daun kemangi , penyedap , air",
-    "Total Steps": "7",
-    "Image": "https://img-global.cpcdn.com/recipes/4a0bb9e71ee86944/1200x630cq70/photo.jpg"
-  },
-.....
-]
-```
-
----
-
-### 🔹 GET `/resep/{id}`
-
-Ambil detail resep berdasarkan ID.
-
-**Contoh:**
-`GET /resep/0ca626cf-dabd-4b7d-b0ae-e0594371db3a`
-
-**Respons:**
+**Request Body:**
 
 ```json
 {
-  "id": "0ca626cf-dabd-4b7d-b0ae-e0594371db3a",
-  "Title": "Ayam Woku Manado",
-  "Ingredients": "1 Ekor Ayam Kampung (potong 12)--2 Buah Jeruk Nipis--2 Sdm Garam--3 Ruas Kunyit--7 Bawang Merah--7 Bawang Putih--10 Cabe Merah--10 Cabe Rawit Merah (sesuai selera)--3 Butir Kemiri--2 Batang Sereh--2 Lembar Daun Salam--2 Ikat Daun Kemangi--Penyedap Rasa--1 1/2 Gelas Air--",
-  "Steps": "1) Cuci bersih ayam dan tiriskan. Lalu peras jeruk nipis (kalo gak ada jeruk nipis bisa pake cuka) dan beri garam. Aduk hingga merata dan diamkan selama 5 menit, biar ayam gak bau amis.\n2) Goreng ayam tersebut setengah matang, lalu tiriskan\n3) Haluskan bumbu menggunakan blender. Bawang merah, bawang putih, cabe merah, cabe rawit, kemiri dan kunyit. Oh iya kasih minyak sedikit yaa biar bisa di blender. Untuk sereh nya di geprek aja terus di buat simpul.\n4) Setelah bumbu di haluskan barulah di tumis. Jangan lupa sereh dan daun salamnya juga ikut di tumis. Di tumis sampai berubah warna ya\n5) Masukan ayam yang sudah di goreng setengah matang ke dalam bumbu yang sudah di tumis, dan diamkan 5 menit dulu. Biar bumbu meresap. Lalu tuangkan 1 1/2 Gelas air. Lalu tambahkan penyedap rasa (saya 3 Sdt, tapi sesuai selera ya) koreksi rasa dan Biar kan sampai mendidih\n6) Setelah masakan mendidih, lalu masukan daun kemangi yang sudah di potong potong. Masak lagi sekitar 10 menit. And taraaaaaaaaaaaaaa..... jadi deh Ayam Woku Manadonya.\n7) Oh iyaa kalo mau di tambahkan potongan tomat merah juga bisa ko. Sesuai selera aja yaa buibuuuu",
-  "Loves": "1",
-  "URL": "https://cookpad.com/id/resep/4473027-ayam-woku-manado",
-  "Category": "ayam",
-  "Title Cleaned": "ayam woku manado",
-  "Total Ingredients": "14",
-  "Ingredients Cleaned": "ayam kampung potong , jeruk nipis , garam , kunyit , bawang merah , bawang putih , cabe merah , cabe rawit merah , kemiri , serai , daun salam , daun kemangi , penyedap , air",
-  "Total Steps": "7",
-  "Image": "https://img-global.cpcdn.com/recipes/4a0bb9e71ee86944/1200x630cq70/photo.jpg"
+  "name": "string, minimal 3 karakter",
+  "email": "string, email valid",
+  "password": "string, minimal 8 karakter"
 }
 ```
 
-**Jika tidak ditemukan:**
+**Response (201 Created):**
 
 ```json
 {
+  "error": false,
+  "message": "User Created",
+  "userId": "id user"
+}
+```
+
+**Error:**
+
+* 400 Bad Request (validasi gagal)
+* 409 Conflict (email sudah terdaftar)
+
+---
+
+### POST /login
+
+Login user.
+
+**Request Body:**
+
+```json
+{
+  "email": "string",
+  "password": "string"
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "error": false,
+  "message": "Login berhasil",
+  "loginResult": {
+    "userId": "id user",
+    "name": "nama user",
+    "token": "JWT token"
+  }
+}
+```
+
+**Error:**
+
+* 404 Not Found (email tidak ditemukan)
+* 401 Unauthorized (password salah)
+
+---
+
+## User Profile
+
+*Semua endpoint di bawah menggunakan autentikasi JWT melalui middleware `authMiddleware`.*
+
+### GET /profile
+
+Ambil data profil user.
+
+**Response (200 OK):**
+
+```json
+{
+  "error": false,
+  "message": "Berhasil mendapatkan profil",
+  "user": {
+    "id": "user id",
+    "name": "nama user",
+    "email": "email user",
+    "photo": "url photo atau string kosong",
+    // field lain kecuali password dan _id
+  }
+}
+```
+
+**Error:**
+
+* 404 Not Found (user tidak ditemukan)
+
+---
+
+### PUT /profile
+
+Update profil user (nama dan foto).
+
+**Request Body:**
+
+```json
+{
+  "name": "string, minimal 3 karakter",
+  "photo": "string (opsional)"
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "error": false,
+  "message": "Profil berhasil diperbarui",
+  "user": {
+    "id": "user id",
+    "name": "nama user baru",
+    "email": "email user",
+    "photo": "photo terbaru"
+  }
+}
+```
+
+**Error:**
+
+* 400 Bad Request (nama kurang dari 3 karakter)
+* 404 Not Found (user tidak ditemukan)
+
+---
+
+### PUT /profile/password
+
+Update password user.
+
+**Request Body:**
+
+```json
+{
+  "currentPassword": "string",
+  "newPassword": "string, minimal 8 karakter"
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "error": false,
+  "message": "Password berhasil diperbarui"
+}
+```
+
+**Error:**
+
+* 404 Not Found (user tidak ditemukan)
+* 401 Unauthorized (password lama salah)
+* 400 Bad Request (password baru kurang dari 8 karakter)
+
+---
+
+## Resep
+
+### GET /resep
+
+Ambil daftar resep, mendukung pencarian dan paginasi.
+
+**Query Parameters (opsional):**
+
+* `search` = string, bahan atau kata kunci, bisa lebih dari satu dipisah koma, contoh: `search=ayam,bawang`
+* `page` = integer, default 1
+* `limit` = integer, default 50, max 50
+
+**Response (200 OK):**
+
+```json
+{
+  "error": false,
+  "data": [
+    {
+      "id": "uuid",
+      "Title": "Judul Resep",
+      "Ingredients": "Daftar bahan lengkap",
+      "Steps": "Langkah-langkah memasak",
+      "Loves": "jumlah suka",
+      "URL": "link resep asli",
+      "Category": "kategori",
+      "Title Cleaned": "judul bersih",
+      "Total Ingredients": "jumlah bahan",
+      "Ingredients Cleaned": "bahan bersih",
+      "Total Steps": "jumlah langkah",
+      "Image": "url gambar"
+    },
+    ...
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 50,
+    "total": 100,
+    "totalPages": 10
+  }
+}
+```
+
+---
+
+### GET /resep/{id}
+
+Ambil detail resep berdasarkan ID.
+
+**Response (200 OK):**
+
+```json
+{
+  "error": false,
+  "data": {
+    "id": "uuid",
+    "Title": "Judul Resep",
+    "Ingredients": "Daftar bahan lengkap",
+    "Steps": "Langkah-langkah memasak",
+    "Loves": "jumlah suka",
+    "URL": "link resep asli",
+    "Category": "kategori",
+    "Title Cleaned": "judul bersih",
+    "Total Ingredients": "jumlah bahan",
+    "Ingredients Cleaned": "bahan bersih",
+    "Total Steps": "jumlah langkah",
+    "Image": "url gambar"
+  }
+}
+```
+
+**Error (404 Not Found):**
+
+```json
+{
+  "error": true,
   "message": "Resep tidak ditemukan"
 }
 ```
 
 ---
 
-### 🔹 GET `/bahan?query=gula`
+## Bookmark
 
-Autocomplete bahan berdasarkan kata kunci.
+*Semua endpoint di bawah harus autentikasi JWT*
 
-**Contoh Respons:**
+### GET /bookmark
+
+Ambil daftar bookmark milik user.
+
+**Response (200 OK):**
 
 ```json
-["gula & garam","gula merah","gula","gula pasir","penyedap gula"]
+{
+  "error": false,
+  "data": [
+    {
+      "userId": "id user",
+      "recipeId": "id resep",
+      "title": "judul resep",
+      "image": "url gambar",
+      "createdAt": "tanggal"
+    },
+    ...
+  ]
+}
 ```
 
 ---
 
-## 🧪 Contoh Penggunaan `curl`
+### POST /bookmark
 
-```bash
-curl http://localhost:3000/resep
-curl http://localhost:3000/resep/0ca626cf-dabd-4b7d-b0ae-e0594371db3a
-curl "http://localhost:3000/bahan?query=garam"
+Tambah bookmark baru.
+
+**Request Body:**
+
+```json
+{
+  "recipeId": "string",
+  "title": "string",
+  "image": "string (url gambar)"
+}
 ```
 
+**Response (201 Created):**
+
+```json
+{
+  "error": false,
+  "message": "Bookmark berhasil ditambahkan"
+}
+```
+
+**Error:**
+
+* 409 Conflict (bookmark sudah ada)
+
 ---
 
-## 🛠️ Teknologi yang Digunakan
+### DELETE /bookmark/{id}
 
-* [@hapi/hapi](https://www.npmjs.com/package/@hapi/hapi)
-* [mongoose](https://www.npmjs.com/package/mongoose)
-* [dotenv](https://www.npmjs.com/package/dotenv)
+Hapus bookmark berdasarkan ID.
+
+**Response (200 OK):**
+
+```json
+{
+  "error": false,
+  "message": "Bookmark dihapus"
+}
+```
+
+**Error:**
+
+* 404 Not Found (bookmark tidak ditemukan)
+
+
+## Teknologi yang Digunakan
+
+* [@hapi/hapi](https://hapi.dev/) — Framework server Node.js
+* [mongoose](https://mongoosejs.com/) — ODM MongoDB (kalau dipakai)
+* [dotenv](https://github.com/motdotla/dotenv) — Manajemen konfigurasi environment variables
+* [bcrypt](https://github.com/kelektiv/node.bcrypt.js/) — Hash password
+* [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken) — Generate dan verifikasi JWT token
+* [joi](https://joi.dev/) — Validasi schema input
+* [mongodb](https://mongodb.github.io/node-mongodb-native/) — Driver MongoDB native
+* [uuid](https://github.com/uuidjs/uuid) — Generate UUID unik
 
 ---
 
-## 🧾 License
+## Instalasi
+
+1. Clone repository
+2. Install dependencies
+
+   ```bash
+   npm install
+   ```
+3. Buat file `.env` dan konfigurasi database serta JWT secret
+4. Jalankan server
+
+   ```bash
+   node server.js
+   ```
+
+---
+
+## Lisensi
 
 CC25-CF275 © 2025 – Made with ❤️ for learning and real-world projects.

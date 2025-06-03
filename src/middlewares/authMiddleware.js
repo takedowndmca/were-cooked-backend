@@ -14,7 +14,7 @@ const authMiddleware = (request, h) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     request.auth = {
       isAuthenticated: true,
-      credentials: decoded, // bisa request.auth.credentials.id
+      credentials: decoded,
     };
     return h.continue;
   } catch (err) {

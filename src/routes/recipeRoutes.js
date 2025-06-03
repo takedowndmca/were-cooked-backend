@@ -10,7 +10,7 @@ const routes = [
     method: 'GET',
     path: '/resep/{id}',
     handler: getRecipeById,
-  }
+  },
 ];
 
 module.exports = routes;

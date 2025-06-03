@@ -1,5 +1,9 @@
 const { authMiddleware } = require('../middlewares/authMiddleware');
-const { getBookmarks, addBookmark, deleteBookmark } = require('../handlers/bookmarkHandler');
+const {
+  getBookmarks,
+  addBookmark,
+  deleteBookmark,
+} = require('../handlers/bookmarkHandler');
 
 const bookmarkRoutes = [
   {

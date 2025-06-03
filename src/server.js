@@ -1,21 +1,21 @@
-require("dotenv").config();
-const Hapi = require("@hapi/hapi");
-const authRoutes = require("./src/routes/authRoutes");
-const userRoutes = require("./src/routes/userRoutes");
-const bookmarkRoutes = require("./src/routes/bookmarkRoutes");
-const recipeRoutes = require("./src/routes/recipeRoutes");
+require('dotenv').config();
+const Hapi = require('@hapi/hapi');
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const bookmarkRoutes = require('./routes/bookmarkRoutes');
+const recipeRoutes = require('./routes/recipeRoutes');
 
-const { connectToMongo } = require("./src/services/db");
+const { connectToMongo } = require('./services/db');
 
 const init = async () => {
   await connectToMongo();
 
   const server = Hapi.server({
     port: process.env.PORT || 3000,
-    host: "localhost",
+    host: 'localhost',
     routes: {
       cors: {
-        origin: ["*"],
+        origin: ['*'],
       },
     },
   });

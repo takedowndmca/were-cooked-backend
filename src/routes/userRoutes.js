@@ -1,5 +1,5 @@
 const userHandler = require('../handlers/userHandler');
-const { authMiddleware } = require('../middlewares/authMiddleware'); // ✅ destructuring
+const { authMiddleware } = require('../middlewares/authMiddleware');
 
 const userRoutes = [
   {
@@ -17,11 +17,11 @@ const userRoutes = [
     handler: userHandler.updateProfile,
   },
   {
-  method: 'PUT',
-  path: '/profile/password',
-  options: { pre: [authMiddleware] },
-  handler: userHandler.updatePassword,
-}
+    method: 'PUT',
+    path: '/profile/password',
+    options: { pre: [authMiddleware] },
+    handler: userHandler.updatePassword,
+  },
 ];
 
 module.exports = userRoutes;
