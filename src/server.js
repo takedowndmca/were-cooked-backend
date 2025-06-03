@@ -1,30 +1,34 @@
-require('dotenv').config()
-const Hapi = require('@hapi/hapi');
-const mongoose = require('mongoose');
-const resepRoutes = require('./routes/resepRoutes');
+require("dotenv").config();
+const Hapi = require("@hapi/hapi");
+const authRoutes = require("./src/routes/authRoutes");
+const userRoutes = require("./src/routes/userRoutes");
+const bookmarkRoutes = require("./src/routes/bookmarkRoutes");
+const recipeRoutes = require("./src/routes/recipeRoutes");
+
+const { connectToMongo } = require("./src/services/db");
 
 const init = async () => {
+  await connectToMongo();
+
   const server = Hapi.server({
     port: process.env.PORT || 3000,
-    host: 'localhost',
+    host: "localhost",
     routes: {
-      cors: true,
+      cors: {
+        origin: ["*"],
+      },
     },
   });
 
-  // Connect ke MongoDB
-  await mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-
-  console.log('✅ MongoDB connected');
-
-  // Daftarkan routes
-  server.route(resepRoutes);
+  server.route([
+    ...authRoutes,
+    ...userRoutes,
+    ...bookmarkRoutes,
+    ...recipeRoutes,
+  ]);
 
   await server.start();
-  console.log(`🚀 Server running at: ${server.info.uri}`);
+  console.log(`Server running at: ${server.info.uri}`);
 };
 
 init();
