@@ -5,15 +5,11 @@ REST API sederhana untuk mencari dan melihat resep makanan berdasarkan bahan, di
 ---
 
 ## 🚀 Fitur
-
-* Registrasi dan login pengguna (autentikasi JWT)
-* Manajemen bookmark resep oleh pengguna
-* Pencarian dan detail resep masakan
-* Pengelolaan profil pengguna (update profil dan password)
-
 - Ambil daftar resep
 - Lihat detail resep berdasarkan ID
-- Autocomplete bahan
+- Registrasi dan login pengguna (autentikasi JWT)
+- Manajemen bookmark resep oleh pengguna
+- Pengelolaan profil pengguna (update profil dan password)
 - Struktur modular dengan controller, handler, dan model
 - Menggunakan `.env` untuk konfigurasi lingkungan
 
@@ -70,6 +66,7 @@ Isi dengan konfigurasi MongoDB lokal:
 ```
 PORT=3000
 MONGO_URI=mongodb://localhost:27017/dapur
+JWT_SECRET=
 ```
 
 ### 3. Jalankan Server
@@ -423,23 +420,6 @@ Hapus bookmark berdasarkan ID.
 * [joi](https://joi.dev/) — Validasi schema input
 * [mongodb](https://mongodb.github.io/node-mongodb-native/) — Driver MongoDB native
 * [uuid](https://github.com/uuidjs/uuid) — Generate UUID unik
-
----
-
-## Instalasi
-
-1. Clone repository
-2. Install dependencies
-
-   ```bash
-   npm install
-   ```
-3. Buat file `.env` dan konfigurasi database serta JWT secret
-4. Jalankan server
-
-   ```bash
-   node server.js
-   ```
 
 ---
 
