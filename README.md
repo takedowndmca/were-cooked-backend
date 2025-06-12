@@ -408,7 +408,201 @@ Hapus bookmark berdasarkan ID.
 **Error:**
 
 * 404 Not Found (bookmark tidak ditemukan)
+---
 
+### 🌐 Base URL Integrasi Machine Learning
+## > Semua endpoint ML dimulai dari prefix `/ml`
+
+## 📋 Daftar Endpoint
+
+### ✅ 1. `GET /health`
+
+**Deskripsi:**
+Cek kesehatan layanan ML API.
+
+**Response:**
+
+```json
+{
+    "features": {
+        "advanced_filtering": true,
+        "ingredient_normalization": true,
+        "multiple_ingredients": true
+    },
+    "models_loaded": true,
+    "status": "healthy",
+    "total_recipes": 11334
+}
+```
+
+---
+
+### ✅ 2. `GET /categories`
+
+**Deskripsi:**
+Ambil daftar kategori makanan & tingkat kompleksitas.
+
+**Response:**
+
+```json
+{
+    "categories": [
+        "Ayam",
+        "Ikan",
+        "Kambing",
+        "Sapi",
+        "Tahu",
+        "Telur",
+        "Tempe",
+        "Udang"
+    ],
+    "complexities": [
+        "Butuh Usaha",
+        "Cepat & Mudah",
+        "Level Dewa Masak"
+    ],
+    "ratings": [
+        1,
+        2,
+        3,
+        4,
+        5
+    ],
+    "stats": {
+        "avg_rating": 2,
+        "total_categories": 8,
+        "total_recipes": 11334
+    },
+    "status": "success"
+}
+```
+
+---
+
+### ✅ 3. `POST /recommend` 🔒
+
+**Deskripsi:**
+Rekomendasi resep berdasarkan bahan makanan dan filter tambahan.
+
+**Headers:**
+
+* `Authorization: Bearer <token>`
+
+**Body (JSON):**
+
+```json
+{
+  "ingredients": ["telur", "cabai"],
+  "complexity_filter": "Cepat & Mudah",  // optional
+  "min_rating": 4,                       // optional
+  "top_n": 5                             // optional
+}
+```
+
+**Response:**
+
+```json
+{
+    "after_filters": 44,
+    "message": "Ditemukan 5 resep untuk bahan: telur, cabai",
+    "recommendations": [
+        {
+            "category": "Telur",
+            "complexity": "Cepat & Mudah",
+            "ingredients": "1/2 kg telur--200 gr cabai hijau--1 buah tomat--3 siung bawang merah--3 siung bawang putih--secukupnya Gula dan garam--secukupnya Minyak goreng--",
+            "rating": 4,
+            "similarity_score": 0.5224,
+            "steps": "1) Rebus telur sampai matang, lalu kupas dan goreng sebentar dengan minyak panas.\n2) Rebus cabai hijau dan duo bawang sampai empuk/matang,tiriskan dan uleg.sisihkan.\n3) Panskan minyak goreng lalu masukan sambal, goreng sampai wangi lalu tambhkan tomat yg sudah d potong2, lalu masukan gula garam dan telur aduk sampai merata.matikan api.",
+            "title": "🌶 telur sambal ijo 🌶"
+        },
+    ]
+}
+```
+
+---
+
+### ✅ 4. `POST /similar` 🔒
+
+**Deskripsi:**
+Ambil resep yang mirip berdasarkan bahan masakan.
+
+**Headers:**
+
+* `Authorization: Bearer <token>`
+
+**Body (JSON):**
+
+```json
+{
+  "recipe_title": "ayam kecap",
+  "top_n": 5
+}
+```
+
+**Response:**
+
+```json
+{
+    "base_recipe": "ayam kecap",
+    "message": "Ditemukan 5 resep yang mirip dengan \"ayam kecap\"",
+    "recommendations": [
+        {
+            "category": "Ayam",
+            "complexity": "Butuh Usaha",
+            "ingredients": "1/4 ayam--Tepung sajiku--2 Bawang putih--3 Bawang merah--1 cm jahe--Cabe rawit--secukupnya Kecap--secukupnya Air--",
+            "rating": 2,
+            "similarity_score": 0.7332,
+            "steps": "1) Ayam dipotong kecil-kecil dan campurkan dengan tepung sajiku, goreng sampai kering lalu tiriskan\n2) Iris tipis bawang putih, bawang merah, cabe rawit dan geprek jahe\n3) Tumis irisan bawang, cabe dan jahe sampai wangi lalu tambah air secukupnya\n4) Setelah air mendidih masukkan ayam dan tambahkan garam, penyedap rasa dan kecap secukupnya\n5) Tunggu hingga kuah menjadi sedikit kental dan ayam tepung kecap siap disiapkan",
+            "title": "Ayam tepung kecap",
+            "url": "https://cookpad.com/id/resep/4459543-ayam-tepung-kecap"
+        },
+    ]
+}
+```
+
+---
+
+## ✅ Validasi Input
+
+**POST /recommend**
+
+* `ingredients`: wajib, bisa string atau array minimal 1 item
+* `complexity_filter`: salah satu dari `["Cepat & Mudah", "Sedang", "Sulit"]` *(optional)*
+* `min_rating`: angka 1–5 *(optional)*
+* `top_n`: angka minimal 1 *(optional)*
+
+**POST /similar**
+
+* `recipe_title`: Wajib, string yang berisi judul resep yang ingin dicari kemiripannya.
+* `top_n`: Angka antara 1 hingga 100 *(optional)*.
+  *(Default: 10 jika tidak diberikan)*
+---
+
+## 🔐 Autentikasi
+
+Gunakan token JWT (Bearer Token) untuk endpoint yang dilindungi (`/recommend` dan `/similar`):
+
+```http
+Authorization: Bearer <token>
+```
+
+---
+
+## 🛠 Contoh Implementasi di Frontend
+
+```js
+await fetch('/ml/recommend', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer YOUR_TOKEN_HERE'
+  },
+  body: JSON.stringify({
+    ingredients: ['telur', 'bawang'],
+    top_n: 5
+  })
+});
+```
 
 ## Teknologi yang Digunakan
 
@@ -420,6 +614,7 @@ Hapus bookmark berdasarkan ID.
 * [joi](https://joi.dev/) — Validasi schema input
 * [mongodb](https://mongodb.github.io/node-mongodb-native/) — Driver MongoDB native
 * [uuid](https://github.com/uuidjs/uuid) — Generate UUID unik
+* [axios](https://github.com/axios/axios) — HTTP client untuk melakukan request API
 
 ---
 

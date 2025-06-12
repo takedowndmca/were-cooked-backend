@@ -1,4 +1,3 @@
-const Joi = require('joi');
 const { registerSchema } = require('../validations/authValidation');
 const { hashPassword } = require('../utils/hash');
 const {

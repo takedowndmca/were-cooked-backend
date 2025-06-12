@@ -4,6 +4,8 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const bookmarkRoutes = require('./routes/bookmarkRoutes');
 const recipeRoutes = require('./routes/recipeRoutes');
+const userPreferencesRoutes = require('./routes/userPreferencesRoutes');
+const mlRoutes = require('./routes/mlRoutes');
 
 const { connectToMongo } = require('./services/db');
 
@@ -25,6 +27,8 @@ const init = async () => {
     ...userRoutes,
     ...bookmarkRoutes,
     ...recipeRoutes,
+    ...userPreferencesRoutes,
+    ...mlRoutes,
   ]);
 
   await server.start();
