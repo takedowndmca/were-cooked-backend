@@ -1,5 +1,6 @@
 const { authMiddleware } = require('../middlewares/authMiddleware');
-const { healthCheckController,
+const {
+  healthCheckController,
   getCategoriesController,
   getRecommendationsController,
   getSimilarRecipesController,

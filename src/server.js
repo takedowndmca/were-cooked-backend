@@ -6,6 +6,7 @@ const bookmarkRoutes = require('./routes/bookmarkRoutes');
 const recipeRoutes = require('./routes/recipeRoutes');
 const userPreferencesRoutes = require('./routes/userPreferencesRoutes');
 const mlRoutes = require('./routes/mlRoutes');
+const homeRoutes = require('./routes/homeRoutes');
 
 const { connectToMongo } = require('./services/db');
 
@@ -29,6 +30,7 @@ const init = async () => {
     ...recipeRoutes,
     ...userPreferencesRoutes,
     ...mlRoutes,
+    ...homeRoutes,
   ]);
 
   await server.start();

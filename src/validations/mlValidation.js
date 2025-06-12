@@ -20,14 +20,11 @@ const recommendSchema = Joi.object({
 });
 
 const similarSchema = Joi.object({
-  recipe_title: Joi.string()
-    .min(1)
-    .required()
-    .messages({
-      'any.required': 'Recipe title wajib diisi',
-      'string.empty': 'Recipe title tidak boleh kosong',
-      'string.min': 'Recipe title minimal 1 karakter',
-    }),
+  recipe_title: Joi.string().min(1).required().messages({
+    'any.required': 'Recipe title wajib diisi',
+    'string.empty': 'Recipe title tidak boleh kosong',
+    'string.min': 'Recipe title minimal 1 karakter',
+  }),
   top_n: Joi.number()
     .integer()
     .min(1)
